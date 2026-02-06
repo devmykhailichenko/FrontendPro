@@ -62,7 +62,7 @@ const book = {
 };
 
 while(true) {
-    const input = prompt("Enter Дія: add or search. Stop to end");
+    const input = prompt("Enter action: add or search. Stop to end");
 
     if(input === null || input === "Stop") {
         break;
