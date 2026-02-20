@@ -45,7 +45,6 @@ showObjInfo();
 showObjInfo();
 
 // Рекурсія
-
 function factorial(n) {
     let result = 1;
 
