@@ -1,0 +1,24 @@
+.text {
+    color: #804444;
+}
+
+.inside {
+    color: #344e85;
+}
+
+.container {
+    width: 200px;
+    height: 100px;
+
+    background-color: #7e8ca5;
+}
+
+.active {
+    background-color: #b6b9c6;
+    border: 1px solid #85283e;
+}
+
+.p-tr {
+    color: #e6e6e6;
+    background-color: #4d78c8;
+}
