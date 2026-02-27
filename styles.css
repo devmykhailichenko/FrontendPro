@@ -1,0 +1,38 @@
+.outer {
+    height: 500px;
+    width: 500px;
+    border: 1px solid black;
+}
+
+.middle {
+    height: 300px;
+    width: 300px;
+    border: 1px solid #8c2d2d;
+}
+
+.inner {
+    height: 300px;
+    width: 300px;
+    border: 1px solid #293363;
+}
+
+.product {
+    width: 500px;
+    padding: 10px;
+    background-color: #888aba;
+    border: 1px solid #90ba87;
+    cursor: pointer;
+}
+
+.product_active {
+    background-color: #c39898;
+}
+
+.errorMessage {
+    color: #e80000;
+    font-weight: bold;
+}
+
+.disabled {
+    display: none;
+}
