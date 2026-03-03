@@ -1,0 +1,7 @@
+.row { margin-bottom: 12px; }
+label { display: inline-block; margin-bottom: 6px; }
+input, select, textarea { display: block; width: 320px; padding: 6px; }
+textarea { height: 90px; }
+.group { padding: 10px; border: 1px solid #ddd; width: 340px; }
+.error { color: #b00020; font-size: 14px; margin-top: 4px; }
+.success { color: #0a7a0a; }
