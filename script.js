@@ -82,7 +82,8 @@ const products = [
     {id: 5, name: "Monitor", price: 4300},
 ];
 
-const cart = [];
+// Get initial data from localStorage
+const cart = JSON.parse(localStorage.getItem("cart")) || [];
 
 const productList = document.querySelector("#products-list");
 const cartContainer = document.querySelector("#cart");
@@ -126,6 +127,20 @@ function renderCart() {
     }
 }
 
+cartContainer.addEventListener("click", (e) => {
+    const productId = +e.target.dataset.id;
+
+    const productInCart = cart.findIndex(product => product.id === productId);
+
+    if(productInCart !== -1) {
+        cart.splice(productInCart, 1);
+
+        localStorage.setItem("cart", JSON.stringify(cart));
+    }
+
+    renderCart();
+});
+
 productList.addEventListener("click", (e) => {
     const productId = +e.target.dataset.id;
 
@@ -141,33 +156,93 @@ productList.addEventListener("click", (e) => {
         }
     }
 
-    renderCart();
+    localStorage.setItem("cart", JSON.stringify(cart)); //Store the cart
+    renderCart(); //Display the cart
 });
 
 renderProducts();
 renderCart();
 
-//Spread rest
-const numbers = [1, 2, 3, 4];
-const numbersComplex = [...numbers, 45, 34, true, "sdfs"];
-
+// JSON (string, number, boolean, object, array, null)
 const user = {
-    name: "Ihor",
-    id: 23
+    name: "Alice",
+    age: 20,
+    address: {
+        street: "Street",
+    }
 };
 
-const userAddress = {
-    city: "Kharkiv",
-    street: "Stadionna square"
-}
+const userStr = JSON.stringify(user);
 
+console.log(userStr, typeof userStr);
 
-const userFullData = {...user, ...userAddress};
+console.log(
+    JSON.parse(userStr)
+);
 
-console.log(numbersComplex, userFullData);
+const jsonData = '{"name": "Alex","age": 28,"isAdmin":true}';
+const jsonArr = '["Alice", "Bob", true, false, 45, 67, [], {}, null]';
 
-function summ(...numbers) {
-    console.log(numbers);
-}
+console.log(JSON.parse(jsonData));
+console.log(JSON.parse(jsonArr));
 
-summ(4, 5, 6, 2, 9);
+// Shallow and Deep copy
+const userCopy = Object.assign({}, user);
+const userDeepCopy = JSON.parse(JSON.stringify(user));
+const userNewDeepCopy = structuredClone(user);
+//user(object) -> string -> new object
+
+//user --------------> {name:...} userDeepCopy = user
+//userDeepCopy ---> user --------------> {name: "Alex"}
+
+user.name = "Alex";
+user.address.street = "Street new";
+
+console.log(
+    "Original:", user,
+    "\nCopied:", userCopy,
+    "\nDeep copy:", userDeepCopy,
+    "\nStructured Clone:", userNewDeepCopy
+);
+
+const arr = [1, 2, 3, [5, 6]];
+const arrCopy = [...arr];
+const sliceCopy = arr.slice();
+const jsonArrCopy = JSON.parse(JSON.stringify(arr));
+const structuredArrClone = structuredClone(arr);
+
+arr[0] = 10;
+arr[3][0] = 6;
+
+console.log(
+    "Original:", arr,
+    "\nCopied:", arrCopy,
+    "\nSlice copy:", sliceCopy,
+    "\nJSON copy:", jsonArrCopy,
+    "\nStructured Clone:", structuredArrClone
+);
+
+// WebStorages, localStorage до 10MB, sessionStorage до 10MB, cookies 4KB, IndexedDB, Cache Storage
+
+const userName = "Bob";
+
+sessionStorage.setItem("userName", userName); //token for payment / theme /
+console.log(sessionStorage.getItem("userName"));
+console.log(sessionStorage.key(0));
+
+sessionStorage.removeItem("userName");
+console.log(sessionStorage.getItem("userName"));
+
+sessionStorage.clear();
+
+sessionStorage.setItem("userData", JSON.stringify(user));
+const userData = sessionStorage.getItem("userData");
+
+console.log(JSON.parse(userData));
+sessionStorage.clear();
+
+const age = 56;
+localStorage.setItem("userAge", String(age));
+console.log(localStorage.getItem("userAge"));
+
+//fetch
