@@ -7,6 +7,42 @@
 </head>
 <body>
 
+<div class="app">
+    <h1>Fetch users and posts!</h1>
+
+    <p class="description">
+        GET, POST, DELETE users from jsonplaceholder
+    </p>
+
+    <div class="layout">
+        <div class="panel">
+            <h2>User:</h2>
+
+            <button id="load-users-btn">Load users</button>
+
+            <p id="user-status" class="status"></p>
+
+            <ul id="users-list" class="list"></ul>
+        </div>
+
+        <div class="panel">
+            <h2>Posts:</h2>
+
+            <p id="selected-user-info" class="selected-user-info">User is not selected</p>
+
+            <div class="actions">
+                <button id="load-posts-btn">Load posts</button>
+
+                <button id="create-posts-btn">Create post</button>
+            </div>
+
+            <p id="posts-status" class="status"></p>
+
+            <div id="posts-list" class="posts"></div>
+        </div>
+    </div>
+</div>
+
 <script src="./script.js"></script>
 </body>
 </html>
