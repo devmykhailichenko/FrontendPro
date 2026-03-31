@@ -91,8 +91,8 @@
 // Promise.any(promises).then((value) => console.log(value));
 
 // function createTodo(todo) {
-//     return fetch('https://jsonplaceholder.typicode.com/todos', {
-//         method: 'POST',
+//     return fetch("https://jsonplaceholder.typicode.com/todos", {
+//         method: "POST",
 //         headers: {
 //             "Content-Type": "application/json",
 //             "Accept": "application/json",
@@ -118,7 +118,7 @@
 //
 // function deleteTodo(id) {
 //     return fetch(`https://jsonplaceholder.typicode.com/todos/${id}`, {
-//         method: 'DELETE',
+//         method: "DELETE",
 //         headers: {
 //             "Content-Type": "application/json",
 //             "Accept": "application/json",
@@ -141,7 +141,7 @@
 //
 // function getTodo(id) {
 //     return fetch(`https://jsonplaceholder.typicode.com/todos/${id}`, {
-//         method: 'GET',
+//         method: "GET",
 //         headers: {
 //             "Content-Type": "application/json",
 //             "Accept": "application/json",
@@ -161,7 +161,7 @@
 //
 // async function getAsyncTodo(id) {
 //     const response = await fetch(`https://jsonplaceholder.typicode.com/todos/${id}`, {
-//         method: 'GET',
+//         method: "GET",
 //         headers: {
 //             "Content-Type": "application/json",
 //             "Accept": "application/json",
@@ -176,37 +176,100 @@
 // getAsyncTodo(7).then(data => {console.log(data)});
 
 //Initialization
-const BASE_URL = 'https://jsonplaceholder.typicode.com';
+const BASE_URL = "https://jsonplaceholder.typicode.com";
 
-const loadUsersBtn = document.querySelector('#load-users-btn');
-const loadPostsBtn = document.querySelector('#load-posts-btn');
-const createPostsBtn = document.querySelector('#create-posts-btn');
+const loadUsersBtn = document.querySelector("#load-users-btn");
+const loadPostsBtn = document.querySelector("#load-posts-btn");
+const createPostsBtn = document.querySelector("#create-posts-btn");
 
-const usersStatus = document.querySelector('#user-status');
-const postsStatus = document.querySelector('#posts-status');
+const usersStatus = document.querySelector("#user-status");
+const postsStatus = document.querySelector("#posts-status");
 
-const usersList = document.querySelector('#users-list');
-const postsList = document.querySelector('#posts-list');
-const selectedUserInfo = document.querySelector('#selected-user-info');
+const usersList = document.querySelector("#users-list");
+const postsList = document.querySelector("#posts-list");
+const selectedUserInfo = document.querySelector("#selected-user-info");
 
-const currentPosts = [];
-const selectedUser = null;
+let currentPosts = [];
+let users = [];
+let selectedUser = null;
 
-// API functions
+//API functions
 async function getUsers() {
-    const response = await fetch(`${BASE_URL}/users`);
+    try {
+        const response = await fetch(`${BASE_URL}/users`);
 
-    const users = await response.json();
+        if(!response.ok) {
+            throw new Error("Bad request")
+        }
 
-    return users;
+        return await response.json();
+    } catch (error) {
+        console.warn(error);
+        return [];
+    }
+}
+
+async function getPostsByUserId(userId) {
+    try {
+        const response = await fetch(`${BASE_URL}/posts?userId=${userId}`);
+
+        if(!response.ok) {
+            throw new Error("Bad request")
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.warn(error);
+        return [];
+    }
+}
+
+async function createPost(postData) {
+    try {
+        const response = await fetch(`${BASE_URL}/posts`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(postData),
+        });
+
+        if(!response.ok) {
+            throw new Error("Bad request")
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.warn(error);
+        return {};
+    }
+}
+
+async function deletePostById(postId) {
+    try {
+        const response = await fetch(`${BASE_URL}/posts/${postId}`, {
+            method: "DELETE",
+        });
+
+        if(!response.ok) {
+            throw new Error("Bad request")
+        }
+
+        return response.status === 200;
+    } catch (error) {
+        console.warn(error);
+        return false;
+    }
 }
 
 //UI functions
 function renderUsers(users) {
-    usersList.innerHTML = '';
+    usersList.innerHTML = "";
 
-    users.forEach((user) => {
-        const li = document.createElement('li');
+    users.forEach(user => {
+        const li = document.createElement("li");
+
+        li.dataset.id = user.id;
 
         li.innerHTML = `
                     <strong>${user.name}</strong><br>
@@ -214,19 +277,114 @@ function renderUsers(users) {
         `;
 
         if(selectedUser && selectedUser.id === user.id) {
-            li.classList.add('active');
+            li.classList.add("active");
         }
 
         usersList.append(li);
     });
 }
 
-loadUsersBtn.addEventListener('click', async () => {
+function renderPosts(posts) {
+    postsList.innerHTML = "";
+
+    if(!posts.length) {
+        postsList.innerHTML = "<p>У користувача немає постів!</p>";
+    }
+
+    posts.forEach(post => {
+        const postEl = document.createElement("article");
+        postEl.className = "post-card";
+
+        postEl.innerHTML = `
+            <h3>${post.title}</h3>
+            <p>${post.body}</p>
+            <button class="delete-btn" data-id=${post.id}>Видалити пост</button>
+        `;
+
+        postsList.append(postEl);
+    });
+}
+
+//Event listeners
+usersList.addEventListener("click", e => {
+    const userIndex = users.findIndex(user => user.id === Number(e.target.dataset.id));
+
+    selectedUser = users[userIndex];
+
+    selectedUserInfo.textContent = `Обрано: ${selectedUser.name} (id: ${selectedUser.id})`;
+
+    postsList.innerHTML = "";
+    postsStatus.textContent = "";
+
+    for (let i = 0; i < usersList.children.length; i++) {
+        if(usersList.children[i] === e.target) {
+            e.target.classList.add("active");
+        } else {
+            usersList.children[i].classList.remove("active");
+        }
+    }
+});
+
+postsList.addEventListener("click", async (e) => {
+    const postId = Number(e.target.dataset.id);
+
+    postsStatus.textContent = `Видаляємо пост #${postId}`;
+
+    const deleted = await deletePostById(postId);
+
+    if(deleted) {
+        currentPosts = currentPosts.filter(item => item.id !== postId);
+
+        renderPosts(currentPosts);
+
+        postsStatus.textContent = `Пост #${postId} видалено успішно!`;
+    }
+});
+
+loadUsersBtn.addEventListener("click", async () => {
     usersStatus.textContent = "Loading users...";
 
-    const users = await getUsers();
+    users = await getUsers();
 
     renderUsers(users);
 
     usersStatus.textContent = "";
+});
+
+loadPostsBtn.addEventListener("click", async () => {
+    if(!selectedUser) {
+        postsStatus.textContent = "Оберіть користувача!";
+        return;
+    }
+
+    postsStatus.textContent = "Завантажуємо пости....";
+
+    currentPosts = await getPostsByUserId(selectedUser.id);
+
+    renderPosts(currentPosts);
+
+    postsStatus.textContent = `Отримано: ${currentPosts.length}`;
+});
+
+createPostsBtn.addEventListener("click", async () => {
+    if(!selectedUser) {
+        postsStatus.textContent = "Спочатку оберіть користувача!";
+        return;
+    }
+
+    postsStatus.textContent = "Створення посту!";
+
+    const postData = {
+        userId: selectedUser.id,
+        title: "New Post",
+        body: "My first post for this blog"
+    };
+
+    const newPost = await createPost(postData);
+
+    currentPosts.unshift(newPost);
+
+    renderPosts(currentPosts);
+
+    postsStatus.textContent = `Пост створений успішно!`;
 });
